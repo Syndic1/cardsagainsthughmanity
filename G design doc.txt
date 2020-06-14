@@ -1,0 +1,23 @@
+Design doc v1
+[] - Maybe to add but not basic game
+
+Database stores black and white cards
+[ability to select different decks]
+
+
+Randomise and deal 1 shared black card – to card tzar to judge, card tzar changes each round
+[other game mode all voting, rather than card tzar]
+
+Randomise and deal to each player several (10) white cards
+[discard full hand and redraw]
+[Rando Cardrissian – just plays 2 cards]
+Note some black cards require multiple response cards
+
+Person deemed to have funniest answer wins the round and gains point
+cards used go to bottom of deck and new cards given to each player back up to hand limit
+
+Game ends when a player reaches score limit
+[variable score limit]
+[make a haiku ending]
+
+
