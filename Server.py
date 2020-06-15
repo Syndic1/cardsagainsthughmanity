@@ -5,84 +5,78 @@ Created on Sun Jun 14 22:21:40 2020
 @author: Jon
 """
 import socket
-import _thread 
-from queue import Queue
+import threading 
 
 
-number_of_threads = 2
-job_number = [1, 2]
-connections = []
-addresses = []
+server = None
+HOST_ADDR = '192.168.1.247'
+HOST_PORT = 25565
+client_name = ' '
+clients = []
+clients_names = []
 
+def start_server():
+    global server, HOST_ADDR, HOST_PORT
 
-lsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-lsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-host = '192.168.1.247'
-port = 25565
-password = b"airsoft"
-
-print ('Server Started')
-print ('Listening on ',host, port)
-
-
-lsock.bind((host,port))
-lsock.listen(5)
-
-def clientthread(conn, addr):
-     
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server.bind((HOST_ADDR,HOST_PORT))
+    server.listen(10)
+    threading._start_new_thread(accept_new_clients, (server, ' '))
+    print ("Server Started")
+    
+    #1b1Host["text"] = "Host: " + HOST_ADDR
+    #1b1Port["text"] = "Port: " + str(HOST_PORT)
+    
+def stop_server():
+     global server, HOST_ADDR, HOST_PORT
+     server.close()
+     print("Server Stopped")
+    
+def accept_new_clients(the_server, y):
     while True:
-        try: 
-            message = conn.recv(2048)
-            if message == password:
-                conn.send("Welcome to the Server")
-                print ("Welcome")
-            else:
-                conn.send(" Wrong Password")
-                print ("not allowed")
-                remove(conn)
-                lsock.close()
+        client, addr = the_server.accept()
+        print('Client Accepted')
+        clients.append(client)
+        
+        threading._start_new_thread(send_receive_client_messages, (client, addr))
+        print('thread started')
+
+def send_receive_client_messages(client_connection, client_IP_addr):
+    global server, client_name, clients, client_addr
+    client_msg = " " 
+    
+    client_name = client_connection.recv(4096)
+    print ('message recieved')
+    client_connection.send(bytes("Welcome ",'utf-8') + client_name)
+    print ('sent welcome')
+    clients_names.append(client_name)
+
+    while True:
+        data = client_connection.recv(4096) 
+        if not data: break
+        if data == "quitButton": break
+    
+        client_msg = data
+        
+        idx = get_client_index(clients, client_connection)
+        sending_client_name = clients_names[idx]
+        
+        for c in clients:
+            if c != client_connection:
+                c.send(sending_client_name + "> " + client_msg)
                 
-        except:
-            continue
-        
-        
-def broadcast(message, connection): 
-    for clients in addresses: 
-        if clients!= connection: 
-            try: 
-                clients.send(message) 
-            except: 
-                clients.close() 
-  
-                # if the link is broken, we remove the client 
-                remove(clients) 
-  
-
-
-def remove(connection): 
-    if connection in list_of_clients: 
-        list_of_clients.remove(connection) 
-   
+        idx = get_client_index(clients, client_connection)
+        del clients_names[idx]
+        del clients[idx]
+        client_connection.close()
     
-while True:
-            conn, addr = lsock.accept()
-            addresses.append(conn)
-            message = conn.recv(2048)
-            print (addr[0] + " is connected")
-            if  conn.recv(message) == password:
-                conn.send("Welcome to the Server")
-                print ("Welcome")
-                _thread.start_new_thread(clientthread(conn,addr))
-            else:
-                conn.send(" Wrong Password")
-                print ("not allowed")
-                remove(conn)
-                lsock.close()
-            
+def get_client_index(client_list, curr_client):
+        
+    idx=0
+    for conn in client_list:
+        if conn == curr_client:
+            break
+        idx = idx + 1
+    return idx
+                
     
-conn.close()
-lsock.close()
-
-print ("end")      
-
-
