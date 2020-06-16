@@ -23,13 +23,18 @@ def connect_to_sql_server(query):
             print(err)
 
 #Runs the taken in query and returns the output
-            
-    curs = connection.cursor()
-    runquery = curs.execute(query)
-    output = curs.fetchall()
+    try:
+        connection
     
-    curs.close
-    connection.close
+    except:
+        return
+
+    else:        
+        curs = connection.cursor()
+        runquery = curs.execute(query)
+        output = curs.fetchall()
+        curs.close
+        connection.close
     
     return output
 
@@ -37,8 +42,9 @@ def connect_to_sql_server(query):
 
 queryOutput = connect_to_sql_server("SELECT * FROM black_cards")
 
-for item in queryOutput:
-    print(item)
-
-    
-                     
+try:
+    for line in queryOutput:
+       print(line)
+       
+except:
+    print("Unable to retrieve data: check connection to server")
