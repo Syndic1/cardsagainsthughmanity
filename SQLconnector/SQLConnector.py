@@ -1,50 +1,47 @@
-##SQL Connector for Cards against Hughmanity
 import mysql.connector
 from mysql.connector import errorcode
 
-## Function to run 1 query, then return the result into an object call queryOutput
-
-def connect_to_sql_server(query):
-
-    try:
-        connection = mysql.connector.connect(user='game', 
-        password = 'Airsoft10!!', 
-        host = 'syndikos.ddns.net',
-        database = 'cah')
+class sql_connect:
     
-## Error handling
+    ##SQL Connector for Cards against Hughmanity
+
+    
+    def __init__(self):
+        pass
+    
+
+    ## Function to run 1 query, then return the result into an object call queryOutput
+
+    def query(query):
+
+        try:    
+            connection = mysql.connector.connect(user='game',   
+            password = 'Airsoft10!!',   
+            host = 'syndikos.ddns.net',
+            database = 'cah')
+    
+       ## Error handling
         
-    except mysql.connector.Error as err:
-        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-            print("Something is wrong with your user name or password")
-        elif err.errno == errorcode.ER_BAD_DB_ERROR:
-            print("Database does not exist")
-        else:
-            print(err)
+        except mysql.connector.Error as err:    
+            if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+                print("Something is wrong with your user name or password")
+            elif err.errno == errorcode.ER_BAD_DB_ERROR:
+                print("Database does not exist")
+            else:
+                print(err)
 
-#Runs the taken in query and returns the output
-    try:
-        connection
+        #Runs the taken in query and returns the output
+        try:
+            connection
+                
+        except:
+            return
+
+        else:           
+            curs = connection.cursor()
+            runquery = curs.execute(query)
+            output = curs.fetchall()    
+            curs.close
+            connection.close
     
-    except:
-        return
-
-    else:        
-        curs = connection.cursor()
-        runquery = curs.execute(query)
-        output = curs.fetchall()
-        curs.close
-        connection.close
-    
-    return output
-
-
-
-queryOutput = connect_to_sql_server("SELECT * FROM black_cards")
-
-try:
-    for line in queryOutput:
-       print(line)
-       
-except:
-    print("Unable to retrieve data: check connection to server")
+            return output
