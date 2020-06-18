@@ -12,7 +12,9 @@ class sql_connect:
 
     ## Function to run 1 query, then return the result into an object call queryOutput
 
-    def query(query):
+    def query(self, query):
+        
+        self.queryin = query
 
         try:    
             connection = mysql.connector.connect(user='game',   
@@ -39,7 +41,7 @@ class sql_connect:
 
         else:           
             curs = connection.cursor()
-            runquery = curs.execute(query)
+            runquery = curs.execute(self.queryin)
             output = curs.fetchall()    
             curs.close
             connection.close
